@@ -1,122 +1,100 @@
+
 # SporeLag
 
-> Lagged and Moving-Average Exposure Features for Aeroallergen Epidemiology
-
 <!-- badges: start -->
-[![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![R CMD check](https://github.com/friveramariani/SporeLag/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/friveramariani/SporeLag/actions/workflows/R-CMD-check.yaml)
+
 <!-- badges: end -->
 
-SporeLag provides deterministic, group-safe utilities for transforming daily
-environmental exposure series — pollen counts, spore counts, ozone, PM, and
-similar time-varying exposures — into analysis-ready features for
-environmental epidemiology and public health research.
+Deterministic, group-safe utilities that turn daily environmental
+exposure series — pollen and spore counts, and other time-varying
+exposures such as ozone or particulate matter — into analysis-ready
+lagged and moving-average features for environmental epidemiology.
 
-Every function follows a single contract: a `data.frame` goes in, the same
-`data.frame` comes back with new columns appended. No input columns are
-modified, dropped, or reordered. Operations are computed strictly within
-group, so values never bleed across sites, seasons, or study participants.
+## Why
+
+Building a lagged exposure looks like a one-liner. It isn’t, because
+daily surveillance data has two different defects that are easy to
+conflate:
+
+- a **missing value** is a hole in a column — `NA` where a sample
+  failed;
+- a **gap** is a hole in *time* — a day with no row at all.
+
+`is.na()` cannot see a gap. And a lag computed by row position on a
+gapped series is a lag by *position*, not by *time*: a “1-day lag”
+silently becomes however many days happen to separate two adjacent rows.
+The resulting exposure column looks plausible, runs cleanly through a
+regression, and yields a misaligned lag–response estimate that nothing
+downstream will flag.
+
+SporeLag makes that failure impossible: the temporal functions refuse to
+operate on a gapped grid.
 
 ## Installation
 
-SporeLag is in active development and not yet on CRAN. Install from GitHub:
-
-```r
-# install.packages("pak")
-pak::pak("friveramariani/SporeLag")
-```
-
-Or with remotes:
-
-```r
+``` r
 # install.packages("remotes")
-remotes::install_github("friveramariani/SporeLag")
+remotes::install_github("<user>/SporeLag")
 ```
-
-Requires R ≥ 4.1.0. The only runtime dependencies are
-[cli](https://cli.r-lib.org) and [rlang](https://rlang.r-lib.org).
 
 ## Usage
 
-### Build a complete daily grid
-
-Before computing lags or moving averages, every time series must be a
-complete daily grid — one row per calendar day, no gaps, no duplicate
-dates within a group. `complete_daily_grid()` enforces this explicitly
-rather than silently filling gaps at the moment you least expect it.
-
-```r
+``` r
 library(SporeLag)
 
-daily <- data.frame(
-  site  = c("Miami", "Miami", "Miami", "Orlando", "Orlando"),
-  date  = as.Date(c(
-    "2023-03-01", "2023-03-02", "2023-03-04",   # gap on Mar 3
-    "2023-03-01", "2023-03-03"                   # gap on Mar 2
-  )),
-  pollen = c(12, 35, 80, 5, 22)
-)
+model_ready <- pollen_demo |>
+  complete_daily_grid(date = "date", by = "site") |>   # close gaps in TIME
+  assign_iso_week(date = "date") |>                    # iso_year + iso_week
+  assign_season(date = "date") |>                      # season label
+  impute_weekly_mean(value = "count", by = "site") |>  # fill NAs, flag them
+  build_moving_average(value = "count_imputed", window = c(3, 7),
+                       date = "date", by = "site") |>
+  apply_lag(value = "count_imputed", lags = 0:3,
+            date = "date", by = "site")
 
-complete_daily_grid(daily, date = "date", by = "site")
-#>      site       date pollen
-#> 1   Miami 2023-03-01     12
-#> 2   Miami 2023-03-02     35
-#> 3   Miami 2023-03-03     NA   # <-- inserted, pollen unknown
-#> 4   Miami 2023-03-04     80
-#> 5 Orlando 2023-03-01      5
-#> 6 Orlando 2023-03-02     NA   # <-- inserted, pollen unknown
-#> 7 Orlando 2023-03-03     22
+names(model_ready)
+#>  [1] "site"               "date"               "count"             
+#>  [4] "iso_week"           "iso_year"           "season"            
+#>  [7] "count_imputed"      "count_imputed_flag" "count_imputed_ma3" 
+#> [10] "count_imputed_ma7"  "count_imputed_lag0" "count_imputed_lag1"
+#> [13] "count_imputed_lag2" "count_imputed_lag3"
 ```
 
-Gaps are filled with `NA` — SporeLag never guesses at missing values.
-Functions that compute lags or moving averages require a complete grid as
-input and raise an informative error if one is not provided.
+`complete_daily_grid()` must come first, or the last two steps error.
+The pipeline enforces its own correctness.
 
 ## Functions
 
-| Function | Status | Purpose |
-|---|---|---|
-| `complete_daily_grid()` | ✅ Available | Fill gaps to produce a complete daily series |
-| `assign_iso_week()` | ✅ Available | Append ISO 8601 week and year columns |
-| `assign_season()` | ✅ Available | Append a configurable season label column |
-| `apply_lag()` | ✅ Phase 3 | Append lagged copies of an exposure column |
-| `build_moving_average()` | 🔨 Phase 3 | Append windowed moving-average exposure columns |
-| `impute_weekly_mean()` | 🔨 Phase 4 | Impute `NA` values using within-group weekly means |
+| Function | Purpose | Appends |
+|----|----|----|
+| `complete_daily_grid()` | insert rows for absent calendar days | rows, not columns |
+| `assign_iso_week()` | ISO 8601 week **and** year | `iso_week`, `iso_year` |
+| `assign_season()` | configurable season label | `season` |
+| `impute_weekly_mean()` | fill `NA`s with the ISO-week mean | `{value}_imputed`, `{value}_imputed_flag` |
+| `build_moving_average()` | trailing windowed mean | `{value}_ma{k}` |
+| `apply_lag()` | time-indexed lags | `{value}_lag{n}` |
 
-## Design
+## Design principles
 
-**Minimal dependencies.** Runtime imports are `cli` and `rlang` only — no
-tidyverse, no zoo, no slider. Rolling statistics and group operations are
-implemented in base R so the package can be used in any environment without
-pulling in a transitive dependency chain.
+- **Append, never modify.** A data frame goes in; the same data frame
+  comes out with new columns. Input columns are never dropped,
+  reordered, or overwritten.
+- **Deterministic.** No randomness. Identical input, identical output —
+  on every operating system.
+- **Group-safe.** `by` is a character vector of column names. Values
+  never bleed across a group boundary.
+- **Fail loudly.** Gaps, duplicate dates, `NA` group keys, and negative
+  lags all raise classed errors rather than producing plausible-looking
+  wrong answers.
+- **Minimal dependencies.** `rlang` and `cli`. That’s it.
 
-**Errors over silence.** When a function detects a problem — a gapped series
-passed to a lag function, duplicate dates within a group, a non-`Date` column
-— it raises a classed condition (e.g. `"sporelag_error_gaps"`) rather than
-silently producing a plausible-looking but wrong result. Tests catch errors
-by class, not by message string.
+## Scope
 
-**Defaults are analytic decisions.** Window alignment, inclusivity, minimum
-observations, season boundaries, and missing-day treatment all change what
-an exposure variable *means* in a regression model. Every default is
-documented explicitly in each function's `@details`. They are not cosmetic.
+SporeLag builds exposure variables. It does not fit models, merge
+outcomes, or define pollen seasons for you — those are analytic
+decisions that belong to you, not to a preprocessing package.
 
-See [`inst/DESIGN-DECISIONS.md`](inst/DESIGN-DECISIONS.md){:target="_blank"} for the
-architectural decisions behind the dependency policy, ISO week
-implementation, and gap-handling strategy.
+## Learn more
 
-## Acknowledgements
-
-SporeLag is developed in collaboration with
-**Dr. Benjamín Bolaños-Rosero**, director of the San Juan and Caguas,
-Puerto Rico, aeroallergen monitoring stations — both certified by the
-[National Allergy Bureau (NAB)](https://github.com/friveramariani/SporeLag){:target="_blank"}.
-His expertise in aeroallergen surveillance and access to longitudinal
-Puerto Rico pollen and spore count data have directly informed the
-package's design priorities: complete-grid enforcement, group-safe
-operations, and explicit, auditable exposure-feature construction.
-
-## License
-
-MIT © Félix E. Rivera-Mariani
+`vignette("getting-started", package = "SporeLag")` walks through the
+pipeline and, more importantly, through the ways it can go wrong.

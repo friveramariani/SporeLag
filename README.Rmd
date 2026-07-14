@@ -1,0 +1,96 @@
+---
+output: github_document
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>", fig.path = "man/figures/README-")
+```
+
+# SporeLag
+
+<!-- badges: start -->
+<!-- badges: end -->
+
+Deterministic, group-safe utilities that turn daily environmental exposure
+series — pollen and spore counts, and other time-varying exposures such as
+ozone or particulate matter — into analysis-ready lagged and moving-average
+features for environmental epidemiology.
+
+## Why
+
+Building a lagged exposure looks like a one-liner. It isn't, because daily
+surveillance data has two different defects that are easy to conflate:
+
+- a **missing value** is a hole in a column — `NA` where a sample failed;
+- a **gap** is a hole in *time* — a day with no row at all.
+
+`is.na()` cannot see a gap. And a lag computed by row position on a gapped
+series is a lag by *position*, not by *time*: a "1-day lag" silently becomes
+however many days happen to separate two adjacent rows. The resulting exposure
+column looks plausible, runs cleanly through a regression, and yields a
+misaligned lag–response estimate that nothing downstream will flag.
+
+SporeLag makes that failure impossible: the temporal functions refuse to
+operate on a gapped grid.
+
+## Installation
+
+```r
+# install.packages("remotes")
+remotes::install_github("<user>/SporeLag")
+```
+
+## Usage
+
+```{r}
+library(SporeLag)
+
+model_ready <- pollen_demo |>
+  complete_daily_grid(date = "date", by = "site") |>   # close gaps in TIME
+  assign_iso_week(date = "date") |>                    # iso_year + iso_week
+  assign_season(date = "date") |>                      # season label
+  impute_weekly_mean(value = "count", by = "site") |>  # fill NAs, flag them
+  build_moving_average(value = "count_imputed", window = c(3, 7),
+                       date = "date", by = "site") |>
+  apply_lag(value = "count_imputed", lags = 0:3,
+            date = "date", by = "site")
+
+names(model_ready)
+```
+
+`complete_daily_grid()` must come first, or the last two steps error. The
+pipeline enforces its own correctness.
+
+## Functions
+
+| Function | Purpose | Appends |
+|---|---|---|
+| `complete_daily_grid()` | insert rows for absent calendar days | rows, not columns |
+| `assign_iso_week()` | ISO 8601 week **and** year | `iso_week`, `iso_year` |
+| `assign_season()` | configurable season label | `season` |
+| `impute_weekly_mean()` | fill `NA`s with the ISO-week mean | `{value}_imputed`, `{value}_imputed_flag` |
+| `build_moving_average()` | trailing windowed mean | `{value}_ma{k}` |
+| `apply_lag()` | time-indexed lags | `{value}_lag{n}` |
+
+## Design principles
+
+- **Append, never modify.** A data frame goes in; the same data frame comes out
+  with new columns. Input columns are never dropped, reordered, or overwritten.
+- **Deterministic.** No randomness. Identical input, identical output — on every
+  operating system.
+- **Group-safe.** `by` is a character vector of column names. Values never bleed
+  across a group boundary.
+- **Fail loudly.** Gaps, duplicate dates, `NA` group keys, and negative lags all
+  raise classed errors rather than producing plausible-looking wrong answers.
+- **Minimal dependencies.** `rlang` and `cli`. That's it.
+
+## Scope
+
+SporeLag builds exposure variables. It does not fit models, merge outcomes, or
+define pollen seasons for you — those are analytic decisions that belong to you,
+not to a preprocessing package.
+
+## Learn more
+
+`vignette("getting-started", package = "SporeLag")` walks through the pipeline
+and, more importantly, through the ways it can go wrong.
