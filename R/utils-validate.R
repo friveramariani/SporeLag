@@ -2,19 +2,20 @@
 #
 # All conditions carry a class so tests and downstream callers can catch them
 # specifically:
-#   sporelag_error_type            - wrong type for an argument
-#   sporelag_error_missing_col     - named column absent from `data`
-#   sporelag_error_date_type       - date column is not class Date
+#   sporelag_error_type            - wrong type for an argument (subclass of sporelag_error_bad_input)
+#   sporelag_error_missing_col     - named column absent from `data` (subclass of sporelag_error_bad_input)
+#   sporelag_error_date_type       - date column is not class Date (subclass of sporelag_error_bad_input)
 #   sporelag_error_missing_date    - NA present in the date column
 #   sporelag_error_group_na        - NA present in a grouping column
 #   sporelag_error_duplicate_dates - duplicate date within a group
 #   sporelag_error_gaps            - date sequence is not a complete daily grid
+#   sporelag_error_bad_input       - output column already exists in `data`
 
 .check_df <- function(data, arg = "data", call = rlang::caller_env()) {
   if (!is.data.frame(data)) {
     cli::cli_abort(
       "{.arg {arg}} must be a data frame, not {.obj_type_friendly {data}}.",
-      class = "sporelag_error_type",
+      class = c("sporelag_error_type", "sporelag_error_bad_input"),
       call  = call
     )
   }
@@ -25,7 +26,7 @@
   if (!is.character(x) || length(x) != 1L || is.na(x) || !nzchar(x)) {
     cli::cli_abort(
       "{.arg {arg}} must be a single, non-empty column name.",
-      class = "sporelag_error_type",
+      class = c("sporelag_error_type", "sporelag_error_bad_input"),
       call  = call
     )
   }
@@ -38,14 +39,14 @@
     cli::cli_abort(
       c("{.arg by} must be {.code NULL} or a character vector of column names.",
         i = "Pass column names as strings, e.g. {.code by = c(\"site\", \"taxon\")}."),
-      class = "sporelag_error_type",
+      class = c("sporelag_error_type", "sporelag_error_bad_input"),
       call  = call
     )
   }
   if (anyDuplicated(by)) {
     cli::cli_abort(
       "{.arg by} contains duplicate column names: {.val {unique(by[duplicated(by)])}}.",
-      class = "sporelag_error_type",
+      class = c("sporelag_error_type", "sporelag_error_bad_input"),
       call  = call
     )
   }
@@ -58,7 +59,7 @@
     cli::cli_abort(
       c("Column{?s} not found in {.arg data}: {.val {missing}}.",
         i = "Available column{?s}: {.val {names(data)}}."),
-      class = "sporelag_error_missing_col",
+      class = c("sporelag_error_missing_col", "sporelag_error_bad_input"),
       call  = call
     )
   }
@@ -73,7 +74,7 @@
       c("Column {.val {date_col}} must be class {.cls Date}, not {.cls {class(x)}}.",
         x = "SporeLag does not guess date formats or coerce silently.",
         i = "Convert explicitly first, e.g. {.code as.Date(x, format = \"%Y-%m-%d\")}."),
-      class = "sporelag_error_date_type",
+      class = c("sporelag_error_date_type", "sporelag_error_bad_input"),
       call  = call
     )
   }
@@ -116,7 +117,7 @@
     floor_txt <- if (allow_zero) "non-negative" else "positive"
     cli::cli_abort(
       "{.arg {arg}} must be {floor_txt} whole number{?s}.",
-      class = "sporelag_error_type",
+      class = c("sporelag_error_type", "sporelag_error_bad_input"),
       call  = call
     )
   }
@@ -227,6 +228,21 @@
              splitting the data into series.",
         i = "Recode {.code NA} to an explicit level, or drop these rows."),
       class = c("sporelag_error_group_na", "sporelag_error_bad_input"),
+      call  = call
+    )
+  }
+  invisible(data)
+}
+
+# Refuse to silently clobber an existing column.
+.check_output_cols <- function(data, cols, call = rlang::caller_env()) {
+  clash <- intersect(cols, names(data))
+  if (length(clash) > 0L) {
+    cli::cli_abort(
+      c("Column{?s} {.val {clash}} already exist{?s/} in {.arg data}.",
+        x = "SporeLag never overwrites an existing column.",
+        i = "Pass a different output name, or drop the existing column first."),
+      class = "sporelag_error_bad_input",
       call  = call
     )
   }
