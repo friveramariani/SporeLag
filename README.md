@@ -106,6 +106,17 @@ See [`inst/DESIGN-DECISIONS.md`](inst/DESIGN-DECISIONS.md) for the
 architectural decisions behind the dependency policy, ISO week
 implementation, and gap-handling strategy.
 
+## Acknowledgements
+
+SporeLag is developed in collaboration with
+**Dr. Benjamín Bolaños-Rosero**, director of the San Juan and Caguas,
+Puerto Rico, aeroallergen monitoring stations — both certified by the
+[National Allergy Bureau (NAB)](https://www.aaaai.org/tools-for-the-public/nab-pollen-counts).
+His expertise in aeroallergen surveillance and access to longitudinal
+Puerto Rico pollen and spore count data have directly informed the
+package's design priorities: complete-grid enforcement, group-safe
+operations, and explicit, auditable exposure-feature construction.
+
 ## License
 
 MIT © Félix E. Rivera-Mariani
