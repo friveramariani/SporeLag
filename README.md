@@ -78,8 +78,8 @@ input and raise an informative error if one is not provided.
 | Function | Status | Purpose |
 |---|---|---|
 | `complete_daily_grid()` | ✅ Available | Fill gaps to produce a complete daily series |
-| `assign_iso_week()` | 🔨 Phase 2 | Append ISO 8601 week and year columns |
-| `assign_season()` | 🔨 Phase 2 | Append a configurable season label column |
+| `assign_iso_week()` | ✅ Available | Append ISO 8601 week and year columns |
+| `assign_season()` | ✅ Available | Append a configurable season label column |
 | `apply_lag()` | 🔨 Phase 3 | Append lagged copies of an exposure column |
 | `build_moving_average()` | 🔨 Phase 3 | Append windowed moving-average exposure columns |
 | `impute_weekly_mean()` | 🔨 Phase 4 | Impute `NA` values using within-group weekly means |
