@@ -27,7 +27,7 @@ test_that("date column must be Date, and complete", {
   expect_error(.check_date_col(pos, "date"), class = "sporelag_error_date_type")
 
   na_d <- d; na_d$date[2] <- NA
-  expect_error(.check_date_col(na_d, "date"), class = "sporelag_error_missing_date")
+  expect_error(.check_date_complete(na_d, "date"), class = "sporelag_error_missing_date")
 
   expect_silent(.check_date_col(d, "date"))
 })
