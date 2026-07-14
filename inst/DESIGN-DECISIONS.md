@@ -122,3 +122,69 @@ decision visible in version control and code review.
 - Do **not** add a `fill_gaps = TRUE` convenience argument to
   `apply_lag()` or `build_moving_average()`. It would silently re-open
   the failure mode this decision exists to prevent.
+
+---
+
+## DD-03 — R build toolchain: pin to `/usr/bin/clang` via `~/.R/Makevars`
+
+**Date:** 2026-07-13  
+**Status:** Accepted  
+**Scope:** Developer machine (macOS 26 Tahoe, arm64) — not a package artifact
+
+### Problem
+
+`devtools::check()` failed with:
+
+```
+clang version 7.0.0 (tags/RELEASE_700/final)
+clang-7: warning: using sysroot for 'MacOSX' but targeting 'iPhone'
+ld: library 'System' not found
+```
+
+**Root cause:** `/usr/local/clang7/bin` appeared on `PATH` before `/usr/bin`,
+so R resolved `clang` to a CRAN-provided LLVM 7 binary (~2018) instead of
+Apple's system compiler. That old compiler targeted the iOS SDK rather than
+macOS, making it impossible to link even a trivial C file.
+
+A previous `~/.R/Makevars` compounded the problem by hardcoding
+`-isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk` into
+`CFLAGS`/`CXXFLAGS`, which is incompatible with the stale compiler.
+
+### Fix
+
+`~/.R/Makevars` was updated to pin `CC`/`CXX` to `/usr/bin/clang`, the macOS
+shim that always resolves through `xcode-select -p` (currently
+`/Applications/Xcode.app` → Apple clang 21). The stale `-isysroot` flags
+were removed.
+
+Current `~/.R/Makevars`:
+
+```makefile
+CC=/usr/bin/clang
+CXX=/usr/bin/clang++
+CXX11=/usr/bin/clang++
+CXX14=/usr/bin/clang++
+CXX17=/usr/bin/clang++
+CXX20=/usr/bin/clang++
+
+CPPFLAGS=-I/opt/homebrew/include -I/usr/local/include
+LDFLAGS=-L/opt/homebrew/lib -L/usr/local/lib
+```
+
+### Verification
+
+```r
+pkgbuild::check_build_tools(debug = TRUE)
+# Your system is ready to build packages!
+# using C compiler: 'Apple clang version 21.0.0 (clang-2100.1.1.101)'
+```
+
+### If this breaks again
+
+1. Run `which clang` — if it returns anything other than `/usr/bin/clang`,
+   a PATH-resident compiler is intercepting R's lookup.
+2. Run `cat ~/.R/Makevars` — confirm `CC=/usr/bin/clang` is present.
+3. Run `xcode-select -p` — should point to
+   `/Applications/Xcode.app/Contents/Developer`.
+4. If Xcode was updated or reinstalled: `sudo xcode-select -r` to reset,
+   then re-verify with `pkgbuild::check_build_tools(debug = TRUE)`.
