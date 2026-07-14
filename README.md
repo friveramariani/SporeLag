@@ -80,7 +80,7 @@ input and raise an informative error if one is not provided.
 | `complete_daily_grid()` | ✅ Available | Fill gaps to produce a complete daily series |
 | `assign_iso_week()` | ✅ Available | Append ISO 8601 week and year columns |
 | `assign_season()` | ✅ Available | Append a configurable season label column |
-| `apply_lag()` | 🔨 Phase 3 | Append lagged copies of an exposure column |
+| `apply_lag()` | ✅ Phase 3 | Append lagged copies of an exposure column |
 | `build_moving_average()` | 🔨 Phase 3 | Append windowed moving-average exposure columns |
 | `impute_weekly_mean()` | 🔨 Phase 4 | Impute `NA` values using within-group weekly means |
 
@@ -102,7 +102,7 @@ observations, season boundaries, and missing-day treatment all change what
 an exposure variable *means* in a regression model. Every default is
 documented explicitly in each function's `@details`. They are not cosmetic.
 
-See [`inst/DESIGN-DECISIONS.md`](inst/DESIGN-DECISIONS.md) for the
+See [`inst/DESIGN-DECISIONS.md`](inst/DESIGN-DECISIONS.md){:target="_blank"} for the
 architectural decisions behind the dependency policy, ISO week
 implementation, and gap-handling strategy.
 
@@ -111,7 +111,7 @@ implementation, and gap-handling strategy.
 SporeLag is developed in collaboration with
 **Dr. Benjamín Bolaños-Rosero**, director of the San Juan and Caguas,
 Puerto Rico, aeroallergen monitoring stations — both certified by the
-[National Allergy Bureau (NAB)](https://www.aaaai.org/tools-for-the-public/nab-pollen-counts).
+[National Allergy Bureau (NAB)](https://github.com/friveramariani/SporeLag){:target="_blank"}.
 His expertise in aeroallergen surveillance and access to longitudinal
 Puerto Rico pollen and spore count data have directly informed the
 package's design priorities: complete-grid enforcement, group-safe
