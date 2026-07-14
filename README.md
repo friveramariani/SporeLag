@@ -6,6 +6,7 @@
 [![R-CMD-check](https://github.com/friveramariani/SporeLag/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/friveramariani/SporeLag/actions/workflows/R-CMD-check.yaml)
 [![Codecov test
 coverage](https://codecov.io/gh/friveramariani/SporeLag/graph/badge.svg)](https://app.codecov.io/gh/friveramariani/SporeLag)
+[![DOI](https://zenodo.org/badge/1299833349.svg)](https://doi.org/10.5281/zenodo.21364422)
 <!-- badges: end -->
 
 Deterministic, group-safe utilities that turn daily environmental

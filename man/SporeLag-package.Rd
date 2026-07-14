@@ -53,11 +53,11 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Félix E. Rivera-Mariani \email{felixrm@friveram.com}
+\strong{Maintainer}: Félix E. Rivera-Mariani, PhD FAAAAI \email{felixrm@friveram.com} (\href{https://orcid.org/0000-0002-6671-0174}{ORCID})
 
 Authors:
 \itemize{
-  \item Félix E. Rivera-Mariani \email{felixrm@friveram.com}
+  \item Félix E. Rivera-Mariani, PhD FAAAAI \email{felixrm@friveram.com} (\href{https://orcid.org/0000-0002-6671-0174}{ORCID})
 }
 
 }
