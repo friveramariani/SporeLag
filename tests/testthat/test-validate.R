@@ -74,7 +74,7 @@ test_that("gaps are detected per group, not globally", {
 })
 
 test_that(".group_id is deterministic and order-stable", {
-  expect_identical(.group_id(d, "site"), .group_id(d, "site"))
-  expect_identical(levels(.group_id(d, "site")), c("A", "B"))
-  expect_length(levels(.group_id(d, NULL)), 1L)
+  expect_identical(.group_ids(d, "site"), .group_ids(d, "site"))
+  expect_identical(levels(.group_ids(d, "site")), c("A", "B"))
+  expect_length(levels(.group_ids(d, NULL)), 1L)
 })
