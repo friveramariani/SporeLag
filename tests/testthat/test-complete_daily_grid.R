@@ -4,7 +4,6 @@ test_that("single gap is filled with NA for value columns", {
     count = c(1L, 3L)
   )
   result <- complete_daily_grid(df, date = "date")
-
   expect_equal(nrow(result), 3L)
   expect_equal(result$date, as.Date(c("2024-01-01", "2024-01-02", "2024-01-03")))
   expect_equal(result$count, c(1L, NA_integer_, 3L))
