@@ -98,7 +98,7 @@ decisions that belong to you, not to a preprocessing package.
 
 **Dr. Benjamín Bolaños-Rosero**, director of the San Juan and Caguas,
 Puerto Rico, aeroallergen monitoring stations — both certified by the
-[National Allergy Bureau (NAB)](https://github.com/friveramariani/SporeLag){:target="_blank"}.
+[National Allergy Bureau (NAB)](https://github.com/friveramariani/SporeLag).
 His expertise in aeroallergen surveillance and access to longitudinal
 Puerto Rico pollen and spore count data have directly informed the
 package's design priorities: complete-grid enforcement, group-safe
