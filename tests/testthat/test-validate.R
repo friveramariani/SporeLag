@@ -34,7 +34,7 @@ test_that("date column must be Date, and complete", {
 
 test_that("NA in a grouping column errors", {
   bad <- d; bad$site[2] <- NA
-  expect_error(.check_group_cols(bad, "site"), class = "sporelag_error_group_na")
+  expect_error(.check_group_complete(bad, "site"), class = "sporelag_error_group_na")
 })
 
 test_that("duplicate dates error, and grouping resolves the false positive", {
