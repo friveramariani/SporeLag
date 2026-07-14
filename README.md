@@ -96,7 +96,7 @@ decisions that belong to you, not to a preprocessing package.
 
 ## Acknowledgements
 
-**Dr. Benjamín Bolaños-Rosero**, director of the San Juan and Caguas,
+This package is being built in collaboration with [**Dr. Benjamín Bolaños-Rosero**](https://md.rcm.upr.edu/micro/dt_team/dr-benjamin-bolanos/), director of the San Juan and Caguas,
 Puerto Rico, aeroallergen monitoring stations — both certified by the
 [National Allergy Bureau (NAB)](https://github.com/friveramariani/SporeLag).
 His expertise in aeroallergen surveillance and access to longitudinal
