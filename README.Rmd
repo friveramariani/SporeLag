@@ -9,6 +9,8 @@ knitr::opts_chunk$set(collapse = TRUE, comment = "#>", fig.path = "man/figures/R
 # SporeLag
 
 <!-- badges: start -->
+[![R-CMD-check](https://github.com/friveramariani/SporeLag/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/friveramariani/SporeLag/actions/workflows/R-CMD-check.yaml)
+[![Codecov test coverage](https://codecov.io/gh/friveramariani/SporeLag/graph/badge.svg)](https://app.codecov.io/gh/friveramariani/SporeLag)
 <!-- badges: end -->
 
 Deterministic, group-safe utilities that turn daily environmental exposure

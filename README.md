@@ -3,6 +3,9 @@
 
 <!-- badges: start -->
 
+[![R-CMD-check](https://github.com/friveramariani/SporeLag/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/friveramariani/SporeLag/actions/workflows/R-CMD-check.yaml)
+[![Codecov test
+coverage](https://codecov.io/gh/friveramariani/SporeLag/graph/badge.svg)](https://app.codecov.io/gh/friveramariani/SporeLag)
 <!-- badges: end -->
 
 Deterministic, group-safe utilities that turn daily environmental
@@ -96,13 +99,16 @@ decisions that belong to you, not to a preprocessing package.
 
 ## Acknowledgements
 
-This package is being built in collaboration with [**Dr. Benjamín Bolaños-Rosero**](https://md.rcm.upr.edu/micro/dt_team/dr-benjamin-bolanos/), director of the San Juan and Caguas,
-Puerto Rico, aeroallergen monitoring stations — both certified by the
-[National Allergy Bureau (NAB)](https://github.com/friveramariani/SporeLag).
+SporeLag is developed in collaboration with
+[**Dr. Benjamín Bolaños-Rosero**](https://md.rcm.upr.edu/micro/dt_team/dr-benjamin-bolanos/),
+director of the San Juan and Caguas, Puerto Rico, aeroallergen monitoring
+stations — both certified by the
+[National Allergy Bureau (NAB)](https://pollen.aaaai.org/#/).
 His expertise in aeroallergen surveillance and access to longitudinal
 Puerto Rico pollen and spore count data have directly informed the
 package's design priorities: complete-grid enforcement, group-safe
 operations, and explicit, auditable exposure-feature construction.
+
 
 ## Learn more
 
