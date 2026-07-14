@@ -27,6 +27,7 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 8.0.0
 Imports: 
     cli,
-    rlang
+    rlang,
+    stats
 Depends: 
     R (>= 4.1.0)
