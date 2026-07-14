@@ -53,11 +53,11 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Jane Félix E. Rivera-Mariani, PhD FAAAAI \email{felixrm@friveram.com}
+\strong{Maintainer}: Félix E. Rivera-Mariani \email{felixrm@friveram.com}
 
 Authors:
 \itemize{
-  \item Jane Félix E. Rivera-Mariani, PhD FAAAAI \email{felixrm@friveram.com}
+  \item Félix E. Rivera-Mariani \email{felixrm@friveram.com}
 }
 
 }
