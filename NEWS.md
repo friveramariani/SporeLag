@@ -2,6 +2,7 @@
 
 First release.
 
+
 ## Exported functions
 
 * `complete_daily_grid()` inserts rows for absent calendar days, within group.
