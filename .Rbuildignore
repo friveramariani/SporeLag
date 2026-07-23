@@ -7,3 +7,5 @@
 ^README\.Rmd$
 ^doc$
 ^Meta$
+^README\.html$
+^CITATION\.cff$
