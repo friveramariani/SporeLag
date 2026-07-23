@@ -1,25 +1,232 @@
+# ------------------------------------------------
+# CITATION.cff file created with {cffr} R package
+# See also: https://docs.ropensci.org/cffr/
+# ------------------------------------------------
+ 
 cff-version: 1.2.0
-message: "If you use this software, please cite it as below."
+message: 'To cite package "SporeLag" in publications use:'
 type: software
-title: "SporeLag: Lagged and Moving-Average Exposure Features for Aeroallergen Epidemiology"
-abstract: >-
-  Deterministic, group-safe utilities that transform daily environmental
-  exposure series (pollen and spore counts, with support for other
-  time-varying exposures such as ozone and particulate matter) into
-  analysis-ready lagged and moving-average exposure features for
-  environmental epidemiology.
-authors:
-  - family-names: "Rivera-Mariani"
-    given-names: "Félix E."
-    name-suffix: "PhD FAAAAI"
-    orcid: "https://orcid.org/0000-0002-6671-0174"
-repository-code: "https://github.com/friveramariani/SporeLag"
-keywords:
-  - R
-  - environmental-epidemiology
-  - aeroallergens
-  - pollen
-  - exposure-assessment
-  - lag-response
+license: MIT
+title: 'SporeLag: Lagged and Moving-Average Exposure Features for Aeroallergen Epidemiology'
 version: 0.1.0
-date-released: 2026-07-14
+doi: 10.5281/zenodo.21364422
+abstract: Deterministic, group-safe utilities that transform daily environmental exposure
+  series (pollen and spore counts, with support for other time-varying exposures such
+  as ozone and particulate matter) into analysis-ready lagged and moving-average exposure
+  features. Functions validate temporal regularity, assign ISO 8601 weeks and configurable
+  seasons, impute missing daily values transparently, and construct lagged and windowed
+  exposures suitable for environmental epidemiology and public health analyses.
+authors:
+- family-names: Rivera-Mariani
+  given-names: Félix E.
+  email: felixrm@friveram.com
+  orcid: https://orcid.org/0000-0002-6671-0174
+preferred-citation:
+  type: manual
+  title: 'SporeLag: Lagged and Moving-Average Exposure Features for Aeroallergen Epidemiology'
+  authors:
+  - family-names: Rivera-Mariani
+    given-names: Félix E.
+    orcid: https://orcid.org/0000-0002-6671-0174
+    email: felixrm@friveram.com
+  year: '2026'
+  notes: R package version 0.1.0
+  doi: 10.5281/zenodo.21364422
+  url: https://github.com/friveramariani/SporeLag
+repository-code: https://github.com/friveramariani/SporeLag
+url: https://github.com/friveramariani/SporeLag
+contact:
+- family-names: Rivera-Mariani
+  given-names: Félix E.
+  email: felixrm@friveram.com
+  orcid: https://orcid.org/0000-0002-6671-0174
+keywords:
+- R
+- environmental-epidemiology
+- aeroallergens
+- pollen
+- exposure-assessment
+- lag-response
+references:
+- type: software
+  title: dplyr
+  abstract: 'dplyr: A Grammar of Data Manipulation'
+  notes: Suggests
+  url: https://dplyr.tidyverse.org
+  repository: https://CRAN.R-project.org/package=dplyr
+  authors:
+  - family-names: Wickham
+    given-names: Hadley
+    email: hadley@posit.co
+    orcid: https://orcid.org/0000-0003-4757-117X
+  - family-names: François
+    given-names: Romain
+    orcid: https://orcid.org/0000-0002-2444-4226
+  - family-names: Henry
+    given-names: Lionel
+  - family-names: Müller
+    given-names: Kirill
+    orcid: https://orcid.org/0000-0002-1416-3412
+  - family-names: Vaughan
+    given-names: Davis
+    email: davis@posit.co
+    orcid: https://orcid.org/0000-0003-4777-038X
+  year: '2026'
+  doi: 10.32614/CRAN.package.dplyr
+- type: software
+  title: knitr
+  abstract: 'knitr: A General-Purpose Package for Dynamic Report Generation in R'
+  notes: Suggests
+  url: https://yihui.org/knitr/
+  repository: https://CRAN.R-project.org/package=knitr
+  authors:
+  - family-names: Xie
+    given-names: Yihui
+    email: xie@yihui.name
+    orcid: https://orcid.org/0000-0003-0645-5666
+  year: '2026'
+  doi: 10.32614/CRAN.package.knitr
+- type: software
+  title: lubridate
+  abstract: 'lubridate: Make Dealing with Dates a Little Easier'
+  notes: Suggests
+  url: https://lubridate.tidyverse.org
+  repository: https://CRAN.R-project.org/package=lubridate
+  authors:
+  - family-names: Spinu
+    given-names: Vitalie
+    email: spinuvit@gmail.com
+  - family-names: Grolemund
+    given-names: Garrett
+  - family-names: Wickham
+    given-names: Hadley
+  year: '2026'
+  doi: 10.32614/CRAN.package.lubridate
+- type: software
+  title: rmarkdown
+  abstract: 'rmarkdown: Dynamic Documents for R'
+  notes: Suggests
+  url: https://pkgs.rstudio.com/rmarkdown/
+  repository: https://CRAN.R-project.org/package=rmarkdown
+  authors:
+  - family-names: Allaire
+    given-names: JJ
+    email: jj@posit.co
+  - family-names: Xie
+    given-names: Yihui
+    email: xie@yihui.name
+    orcid: https://orcid.org/0000-0003-0645-5666
+  - family-names: Dervieux
+    given-names: Christophe
+    email: cderv@posit.co
+    orcid: https://orcid.org/0000-0003-4474-2498
+  - family-names: McPherson
+    given-names: Jonathan
+    email: jonathan@posit.co
+  - family-names: Luraschi
+    given-names: Javier
+  - family-names: Ushey
+    given-names: Kevin
+    email: kevin@posit.co
+  - family-names: Atkins
+    given-names: Aron
+    email: aron@posit.co
+  - family-names: Wickham
+    given-names: Hadley
+    email: hadley@posit.co
+  - family-names: Cheng
+    given-names: Joe
+    email: joe@posit.co
+  - family-names: Chang
+    given-names: Winston
+    email: winston@posit.co
+  - family-names: Iannone
+    given-names: Richard
+    email: rich@posit.co
+    orcid: https://orcid.org/0000-0003-3925-190X
+  year: '2026'
+  doi: 10.32614/CRAN.package.rmarkdown
+- type: software
+  title: spelling
+  abstract: 'spelling: Tools for Spell Checking in R'
+  notes: Suggests
+  url: https://ropensci.r-universe.dev/spelling
+  repository: https://CRAN.R-project.org/package=spelling
+  authors:
+  - family-names: Ooms
+    given-names: Jeroen
+    email: jeroenooms@gmail.com
+    orcid: https://orcid.org/0000-0002-4035-0289
+  - family-names: Hester
+    given-names: Jim
+    email: james.hester@rstudio.com
+  year: '2026'
+  doi: 10.32614/CRAN.package.spelling
+- type: software
+  title: testthat
+  abstract: 'testthat: Unit Testing for R'
+  notes: Suggests
+  url: https://testthat.r-lib.org
+  repository: https://CRAN.R-project.org/package=testthat
+  authors:
+  - family-names: Wickham
+    given-names: Hadley
+    email: hadley@posit.co
+  year: '2026'
+  doi: 10.32614/CRAN.package.testthat
+  version: '>= 3.0.0'
+- type: software
+  title: cli
+  abstract: 'cli: Helpers for Developing Command Line Interfaces'
+  notes: Imports
+  url: https://cli.r-lib.org
+  repository: https://CRAN.R-project.org/package=cli
+  authors:
+  - family-names: Csárdi
+    given-names: Gábor
+    email: gabor@posit.co
+  year: '2026'
+  doi: 10.32614/CRAN.package.cli
+- type: software
+  title: rlang
+  abstract: 'rlang: Functions for Base Types and Core R and ''Tidyverse'' Features'
+  notes: Imports
+  url: https://rlang.r-lib.org
+  repository: https://CRAN.R-project.org/package=rlang
+  authors:
+  - family-names: Henry
+    given-names: Lionel
+    email: lionel@posit.co
+  - family-names: Wickham
+    given-names: Hadley
+    email: hadley@posit.co
+  year: '2026'
+  doi: 10.32614/CRAN.package.rlang
+- type: software
+  title: stats
+  abstract: 'R: A Language and Environment for Statistical Computing'
+  notes: Imports
+  authors:
+  - name: R Core Team
+    website: https://ror.org/02zz1nj61
+  institution:
+    name: R Foundation for Statistical Computing
+    website: https://ror.org/05qewa988
+    address: Vienna, Austria
+  year: '2026'
+  doi: 10.32614/R.manuals
+- type: software
+  title: 'R: A Language and Environment for Statistical Computing'
+  notes: Depends
+  url: https://www.R-project.org/
+  authors:
+  - name: R Core Team
+    website: https://ror.org/02zz1nj61
+  institution:
+    name: R Foundation for Statistical Computing
+    website: https://ror.org/05qewa988
+    address: Vienna, Austria
+  year: '2026'
+  doi: 10.32614/R.manuals
+  version: '>= 4.1.0'
+

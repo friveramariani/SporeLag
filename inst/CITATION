@@ -2,7 +2,8 @@ citHeader("To cite SporeLag in publications, please use:")
 bibentry(
   bibtype  = "Manual",
   title    = "{SporeLag}: Lagged and Moving-Average Exposure Features for Aeroallergen Epidemiology",
-  author   = person("Félix E.", "Rivera-Mariani, PhD FAAAAI"),
+  author   = person("Félix E.", "Rivera-Mariani",
+                    comment = c(ORCID = "0000-0002-6671-0174")),
   year     = "2026",
   note     = "R package version 0.1.0",
   doi      = "10.5281/zenodo.21364422",
