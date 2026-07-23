@@ -10,3 +10,8 @@
 ^README\.html$
 ^CITATION\.cff$
 ^\.zenodo\.json$
+^.*\.Rcheck$
+^SporeLag.*\.tar\.gz$
+^\.Rhistory$
+^cran-comments\.md$
+^CRAN-SUBMISSION$
