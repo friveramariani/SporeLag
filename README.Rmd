@@ -90,8 +90,8 @@ pipeline enforces its own correctness.
 ## Scope
 
 SporeLag builds exposure variables. It does not fit models, merge outcomes, or
-define pollen seasons for you — those are analytic decisions that belong to you,
-not to a preprocessing package.
+define aeroallergen or pollutant seasons for you — those are analytic decisions
+that belong to you, not to a preprocessing package.
 
 ## Learn more
 
