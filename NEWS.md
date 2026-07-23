@@ -1,3 +1,15 @@
+# SporeLag 0.1.1
+
+Maintenance and packaging fixes; no user-facing API changes.
+
+* Fixed the installation instructions in the README (replaced the `<user>`
+  placeholder with the repository owner).
+* Removed build and check artifacts (`*.Rcheck/`, source tarball, `README.html`)
+  from version control and added them to `.gitignore`.
+* Cleaned up the `Authors@R` field and citation metadata (`inst/CITATION`,
+  `CITATION.cff`), removing a name suffix that was embedded in the family name.
+* `R CMD check` now passes with no errors, warnings, or notes.
+
 # SporeLag 0.1.0
 
 First release.

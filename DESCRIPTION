@@ -1,7 +1,7 @@
 Package: SporeLag
 Type: Package
 Title: Lagged and Moving-Average Exposure Features for Aeroallergen Epidemiology
-Version: 0.1.0
+Version: 0.1.1
 Authors@R: 
     person("Félix E.", "Rivera-Mariani",
            email = "felixrm@friveram.com",

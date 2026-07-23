@@ -5,7 +5,7 @@ bibentry(
   author   = person("Félix E.", "Rivera-Mariani",
                     comment = c(ORCID = "0000-0002-6671-0174")),
   year     = "2026",
-  note     = "R package version 0.1.0",
+  note     = "R package version 0.1.1",
   doi      = "10.5281/zenodo.21364422",
   url      = "https://github.com/friveramariani/SporeLag"
 )
