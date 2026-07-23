@@ -37,7 +37,7 @@ operate on a gapped grid.
 
 ``` r
 # install.packages("remotes")
-remotes::install_github("<user>/SporeLag")
+remotes::install_github("friveramariani/SporeLag")
 ```
 
 ## Usage
