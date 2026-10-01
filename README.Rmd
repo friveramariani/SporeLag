@@ -85,7 +85,8 @@ pipeline enforces its own correctness.
   across a group boundary.
 - **Fail loudly.** Gaps, duplicate dates, `NA` group keys, and negative lags all
   raise classed errors rather than producing plausible-looking wrong answers.
-- **Minimal dependencies.** `rlang` and `cli`. That's it.
+- **Minimal dependencies.** `rlang` and `cli`, plus `stats` from base R.
+  That's it.
 
 ## Scope
 

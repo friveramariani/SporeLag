@@ -1,3 +1,14 @@
+# SporeLag 0.1.2
+
+CRAN resubmission; no changes to the API or behaviour.
+
+* Replaced the placeholder `getting-started` vignette with a full walkthrough
+  of the pipeline on `pollen_demo`, covering gaps vs. missing values, the
+  classed gap error, ISO week/year boundaries, custom seasons, imputation
+  flags and `min_obs`, moving-average defaults, and within-group lags.
+* README now notes that `stats` (part of base R) is imported alongside `cli`
+  and `rlang`.
+
 # SporeLag 0.1.1
 
 Maintenance and packaging fixes; no user-facing API changes.
