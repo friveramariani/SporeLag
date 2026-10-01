@@ -1,8 +1,8 @@
 ---
-title: "getting-started"
+title: "Getting started with SporeLag"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{getting-started}
+  %\VignetteIndexEntry{Getting started with SporeLag}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -17,3 +17,271 @@ knitr::opts_chunk$set(
 ```{r setup}
 library(SporeLag)
 ```
+
+SporeLag turns a daily exposure series (pollen or spore counts, ozone,
+particulate matter) into lagged and moving-average exposure variables for
+epidemiological models. This vignette walks through the full pipeline on the
+bundled `pollen_demo` data and, along the way, shows the ways the pipeline
+can go wrong and how SporeLag stops them from going wrong silently.
+
+## The data: gaps are not missing values
+
+`pollen_demo` is a **synthetic** dataset of daily pollen counts at two
+monitoring sites over one spring season. It is not real surveillance data.
+
+```{r}
+str(pollen_demo)
+```
+
+The season runs from 2024-02-15 to 2024-06-30, which is 137 days. Neither site
+has 137 rows:
+
+```{r}
+table(pollen_demo$site)
+```
+
+The data contain two different defects, and it is worth being precise about
+the difference:
+
+- a **missing value** is a row whose `count` is `NA`, for example a sample
+  that failed on a day the station was running;
+- a **gap** is a day with **no row at all**, for example a week when the
+  sampler was offline.
+
+`is.na()` sees the first kind and is blind to the second:
+
+```{r}
+tapply(is.na(pollen_demo$count), pollen_demo$site, sum)
+```
+
+Here is the North site around its gap. The rows jump from 17 March straight
+to 23 March:
+
+```{r}
+north <- pollen_demo[pollen_demo$site == "North", ]
+north[north$date >= as.Date("2024-03-15") & north$date <= as.Date("2024-03-25"), ]
+```
+
+## Lags on a gapped series fail loudly
+
+A lag computed by row position on this series would be wrong. "Yesterday"
+for 23 March would be 17 March, six days earlier. The resulting column would
+look plausible, run cleanly through a regression, and give a misaligned
+lag-response estimate that nothing downstream would flag.
+
+For that reason the two temporal functions, `apply_lag()` and
+`build_moving_average()`, check that each group is on a complete daily grid
+and refuse to run if it is not:
+
+```{r, error = TRUE}
+apply_lag(pollen_demo, value = "count", lags = 1, date = "date", by = "site")
+```
+
+The error has class `sporelag_error_gaps`, so code that wraps SporeLag can
+catch it specifically rather than matching on the message text:
+
+```{r}
+tryCatch(
+  apply_lag(pollen_demo, value = "count", lags = 1, date = "date", by = "site"),
+  sporelag_error_gaps = function(e) "gapped grid detected"
+)
+```
+
+There is deliberately no `fill_gaps = TRUE` argument. Closing gaps is a
+separate, visible step.
+
+## Step 1: complete the daily grid
+
+`complete_daily_grid()` inserts a row for every absent calendar day within
+each group. Inserted rows carry `NA` in every column other than the date and
+the grouping columns; nothing is guessed.
+
+```{r}
+grid <- complete_daily_grid(pollen_demo, date = "date", by = "site")
+table(grid$site)
+sum(is.na(grid$count))
+```
+
+Each site now has all 137 days. The gaps have become ordinary missing values,
+which is a problem we can reason about explicitly.
+
+## Step 2: calendar features
+
+### ISO weeks
+
+`assign_iso_week()` appends the ISO 8601 week **and** the ISO year. Both are
+needed, because the ISO year of a date near New Year is often not its calendar
+year:
+
+```{r}
+new_year <- data.frame(date = as.Date(c("2024-12-29", "2024-12-30", "2025-01-01")))
+assign_iso_week(new_year, date = "date")
+```
+
+30 December 2024 belongs to week 1 of ISO year 2025. Grouping a multi-year
+series by `iso_week` alone would pool unrelated days from different years, so
+always group by both columns. The weeks are computed in base R, giving
+identical results on every operating system.
+
+### Seasons
+
+`assign_season()` appends a season label as an ordered factor. The default is
+the meteorological calendar:
+
+```{r}
+grid <- grid |>
+  assign_iso_week(date = "date") |>
+  assign_season(date = "date")
+
+table(grid$season, grid$site)
+```
+
+A calendar season is not a pollen season. Pollen seasons are taxon- and
+region-specific, so for exposure work you will usually want to supply your own
+season start dates with `definition = "custom"`. The dates below are
+illustrative, not a recommendation:
+
+```{r}
+custom <- assign_season(
+  grid[, c("site", "date")],
+  date = "date",
+  definition = "custom",
+  breaks = c(Dormant = "11-01", Tree = "02-15", Grass = "05-01", Weed = "08-01")
+)
+table(custom$season, custom$site)
+```
+
+## Step 3: impute missing values, and keep track of what you imputed
+
+`impute_weekly_mean()` fills each missing day with the mean of the observed
+days in the same ISO week, within site. It never overwrites the input column.
+Instead, it appends the completed series and a logical flag:
+
+```{r}
+grid <- impute_weekly_mean(grid, value = "count", by = "site")
+
+grid[grid$site == "North" &
+       grid$date >= as.Date("2024-03-16") & grid$date <= as.Date("2024-03-25"),
+     c("date", "iso_week", "count", "count_imputed", "count_imputed_flag")]
+```
+
+This output exposes a real weakness of the default. North's offline period
+fills almost all of ISO week 12, so six days have been filled from **a single
+observation** (24 March). The `min_obs` argument sets how many observed days a
+week needs before its mean is used:
+
+```{r}
+strict <- impute_weekly_mean(
+  grid[, c("site", "date", "count", "iso_week", "iso_year")],
+  value = "count", by = "site", min_obs = 4
+)
+sum(strict$count_imputed_flag)
+sum(is.na(strict$count_imputed))
+```
+
+With `min_obs = 4`, weeks with fewer than four observed days are left `NA`
+rather than extrapolated.
+
+Whatever threshold you choose, imputation replaces day-to-day variation with a
+constant. That shrinks the variance of the exposure and tends to bias effect
+estimates toward the null. Use the flag column to report the proportion
+imputed and to run a complete-case sensitivity analysis:
+
+```{r}
+tapply(grid$count_imputed_flag, grid$site, mean)
+```
+
+## Step 4: moving averages
+
+`build_moving_average()` appends one column per window. By default the window
+is **trailing and includes the current day**: `window = 3` averages today and
+the two previous days.
+
+```{r}
+grid <- build_moving_average(
+  grid, value = "count_imputed", window = c(3, 7), date = "date", by = "site"
+)
+```
+
+Three defaults are worth knowing, because each changes what the variable
+means:
+
+- **Edge windows are `NA`.** The first `window - 1` days of each site have no
+  complete window, so a 7-day mean is `NA` for the first six days rather than
+  being computed from fewer days.
+- **`min_obs = window`.** Any `NA` inside a window makes the mean `NA`. You
+  can lower it to tolerate missing days, but that has the same
+  variance-shrinking effect as imputation.
+- **`align = "center"` uses future exposure.** It is useful for smoothing a
+  plot, but it should not be used to build an exposure for an outcome measured
+  on the current day.
+
+To see what `min_obs` does, apply a 7-day window to the raw (non-imputed)
+counts:
+
+```{r}
+raw_ma <- build_moving_average(grid[, c("site", "date", "count")],
+                               value = "count", window = 7,
+                               date = "date", by = "site")
+sum(is.na(raw_ma$count_ma7))
+
+raw_ma5 <- build_moving_average(grid[, c("site", "date", "count")],
+                                value = "count", window = 7, min_obs = 5,
+                                date = "date", by = "site")
+sum(is.na(raw_ma5$count_ma7))
+```
+
+## Step 5: lags
+
+`apply_lag()` appends one column per lag. Lag `n` places the value from `n`
+days earlier alongside the current day. `lags = 0` gives a copy of the
+same-day value, so you can build a uniform `lag0, lag1, ...` model matrix.
+Negative lags are an error, since a negative lag would pair an outcome with
+exposure measured after it.
+
+```{r}
+grid <- apply_lag(
+  grid, value = "count_imputed", lags = 0:3, date = "date", by = "site"
+)
+```
+
+Lags are computed strictly within each site. The first rows of the South
+series are `NA`, not the last values of the North series:
+
+```{r}
+south <- grid[grid$site == "South", ]
+head(south[, c("site", "date", "count_imputed",
+               "count_imputed_lag1", "count_imputed_lag3")], 4)
+```
+
+## The whole pipeline
+
+Each function takes a data frame and returns the same data frame with new
+columns appended, so the steps chain naturally:
+
+```{r}
+model_ready <- pollen_demo |>
+  complete_daily_grid(date = "date", by = "site") |>
+  assign_iso_week(date = "date") |>
+  assign_season(date = "date") |>
+  impute_weekly_mean(value = "count", by = "site") |>
+  build_moving_average(value = "count_imputed", window = c(3, 7),
+                       date = "date", by = "site") |>
+  apply_lag(value = "count_imputed", lags = 0:3,
+            date = "date", by = "site")
+
+dim(model_ready)
+names(model_ready)
+```
+
+The input columns `site`, `date`, and `count` are unchanged; everything else
+was appended. If you leave out `complete_daily_grid()`, the last two steps
+raise an error instead of returning misaligned lags.
+
+## What SporeLag does not do
+
+SporeLag builds exposure variables. It does not merge them with health
+outcomes, fit models, or decide for you what counts as a pollen season,
+whether imputation is acceptable, or how much missingness a window may
+tolerate. Those are analytic decisions. The package makes them explicit
+arguments so that they are visible in your code and can be reported.
